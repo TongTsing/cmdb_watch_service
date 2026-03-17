@@ -1,0 +1,40 @@
+# pre-commit 配置
+# 在 git commit 前自动执行代码检查
+
+repos:
+
+  # ==============================
+  # Black - Python代码格式化
+  # ==============================
+  - repo: https://github.com/psf/black
+    rev: 24.4.2
+    hooks:
+      - id: black
+        # 统一代码风格
+        args: ["--line-length=88"]
+
+  # ==============================
+  # Ruff - Python lint工具
+  # 比 flake8 更快
+  # ==============================
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.4.4
+    hooks:
+      - id: ruff
+
+
+  # ==============================
+  # 通用代码检查
+  # ==============================
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+
+      # 删除行尾空格
+      - id: trailing-whitespace
+
+      # 确保文件最后有换行
+      - id: end-of-file-fixer
+
+      # 检查yaml文件
+      - id: check-yaml

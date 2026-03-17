@@ -1,0 +1,41 @@
+# Docker Compose 用于本地开发依赖服务
+
+version: "3.9"
+
+services:
+
+  # ==============================
+  # PostgreSQL 数据库
+  # ==============================
+  postgres:
+    image: postgres:15
+
+    container_name: my_backend_postgres
+
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: mydb
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+
+  # ==============================
+  # Redis 缓存
+  # ==============================
+  redis:
+    image: redis:7
+
+    container_name: my_backend_redis
+
+    ports:
+      - "6379:6379"
+
+
+# 数据持久化
+volumes:
+  postgres_data:
