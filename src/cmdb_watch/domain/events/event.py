@@ -1,8 +1,11 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum
-from typing import Dict, Any, NewType
+from typing import Any, NewType
 
-from cmdb_watch.domain.entities.watcher import Watcher, Cursor, WatcherId, WatcherRule, WatcherRuleId, WatcherRuleModel
+from cmdb_watch.domain.entities.watcher import (
+    WatcherId,
+    WatcherRuleModel,
+)
 
 InstanceID = NewType("InstanceID", str)
 

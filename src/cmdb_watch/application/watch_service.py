@@ -1,34 +1,37 @@
-from cmdb_watch.domain.entities.watcher import Watcher
 from cmdb_watch.domain.services.notification_service import NotificationService
-from cmdb_watch.domain.services.watcher_service import WatcherService
-
-
-from cmdb_watch.domain.entities.watcher import Watcher
 from cmdb_watch.domain.services.watcher_service import WatcherService
 from cmdb_watch.infrastructure.watch_client import WatchClient
 from cmdb_watch.infrastructure.watcher_repository import WatcherRepository
 
 
 class WatchService:
-    def __init__(self, watcher_service: WatcherService, watch_client: WatchClient, notification_service: NotificationService, watcher_repo: WatcherRepository):
-        self.watcher_service = watcher_service
-        self.watch_client = watch_client
-        self.notification_service = notification_service
+
+    def __init__(
+        self,
+        watcher_repo: WatcherRepository,
+        watch_client: WatchClient,
+        watcher_service: WatcherService,
+        notifier: NotificationService,
+    ):
         self.watcher_repo = watcher_repo
+        self.client = watch_client
+        self.watcher_service = watcher_service
+        self.notifier = notifier
 
-    def run(self, watcher: Watcher):
-        # 1. 拉取 CMDB 变化数据
-        data = self.watch_client.fetch_data(watcher)
+    def run(self):
 
-        # 2. 调用领域服务生成变化事件
-        events = self.watcher_service.run(watcher, data)
+        watchers = self.watcher_repo.get_all()
 
-        # 3. 更新 cursor（取 data 中最大 position / id / timestamp）
-        if data:
-            last_position = max(item['position'] for item in data)
-            watcher.update_cursor(last_position)
+        for watcher in watchers:
+
+            data = self.client.fetch_data(watcher)
+
+            events = self.watcher_service.run(watcher, data)
+
+            if events:
+                self.notifier.notify(events)
+
+            # 更新 cursor（你后面可以细化）
+            watcher.update_cursor(data[-1]["bk_cursor"])
+
             self.watcher_repo.save(watcher)
-
-        # 4. 发送通知
-        if events:
-            self.notification_service.notify(events)

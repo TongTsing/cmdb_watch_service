@@ -14,11 +14,7 @@ class WatcherService(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def detect_changes(
-        self,
-        watcher: Watcher,
-        new_data: dict
-    ) -> list[ChangedEvent]:
+    def detect_changes(self, watcher: Watcher, new_data: dict) -> list[ChangedEvent]:
         """
         对比字段生成变化事件
         """

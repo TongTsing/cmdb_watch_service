@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from cmdb_watch.domain.entities.watcher import Watcher
+from cmdb_watch.domain.entities.watcher import Watcher, WatcherId
 
 
 class WatcherRepository(ABC):
@@ -9,14 +9,14 @@ class WatcherRepository(ABC):
         保存 Watcher
         """
         raise NotImplementedError
-    
+
     @abstractmethod
-    def get_by_id(self, watcher_id: str) -> Watcher:
+    def get_by_id(self, watcher_id: WatcherId) -> Watcher:
         """
         根据 ID 获取 Watcher
         """
         raise NotImplementedError
-    
+
     @abstractmethod
     def get_all(self) -> list[Watcher]:
         """

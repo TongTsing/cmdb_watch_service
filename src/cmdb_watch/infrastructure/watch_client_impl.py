@@ -1,8 +1,9 @@
+import json
 import time
 import requests
 
-from watch_client import WatchClient
-from src.cmdb_watch.domain.entities.watcher import Watcher
+from cmdb_watch.infrastructure.watch_client import WatchClient
+from cmdb_watch.domain.entities.watcher import Watcher
 
 
 class WatchClientImpl(WatchClient):
@@ -18,14 +19,8 @@ class WatchClientImpl(WatchClient):
             "bk_supplier_account": "0",
             "bk_resource": "object_instance",
             "bk_event_types": ["create", "update", "delete"],
-            "bk_fields": [
-                "bk_inst_id",
-                "bk_inst_name",
-                "field_1"
-            ],
-            "bk_filter": {
-                "bk_sub_resource": "test_tq"
-            }
+            "bk_fields": ["bk_inst_id", "bk_inst_name", "field_1"],
+            "bk_filter": {"bk_sub_resource": "test_tq"},
         }
 
         if watcher.cursor.value:
@@ -33,17 +28,18 @@ class WatchClientImpl(WatchClient):
         else:
             payload["bk_start_from"] = int(time.time())
 
-        headers = {
-            'X-Bkapi-Authorization': f'{"bk_app_code": {self.app_code},"bk_app_secret": {self.app_secret}, "bk_username": "admin"}',
-            'Content-Type': 'application/json'
+        x_bkapi_authorization = {
+            "bk_app_code": self.app_code,
+            "bk_app_secret": self.app_secret,
+            "bk_username": "admin",
         }
 
-        resp = requests.post(
-            self.url,
-            headers=headers,
-            json=payload,
-            timeout=10
-        )
+        headers = {
+            "X-Bkapi-Authorization": json.dumps(x_bkapi_authorization),
+            "Content-Type": "application/json",
+        }
+
+        resp = requests.post(self.url, headers=headers, json=payload, timeout=10)
 
         resp.raise_for_status()
 
@@ -57,4 +53,4 @@ class WatchClientImpl(WatchClient):
         if not watched:
             return []
 
-        return watched
+        return data["data"].get("bk_events", [])

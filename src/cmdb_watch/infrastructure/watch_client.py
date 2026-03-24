@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from src.cmdb_watch.domain.entities.watcher import Watcher
+from cmdb_watch.domain.entities.watcher import Watcher
 
 
 class WatchClient(ABC):
@@ -9,5 +9,3 @@ class WatchClient(ABC):
         拉取 CMDB 变化数据
         """
         raise NotImplementedError
-    
-

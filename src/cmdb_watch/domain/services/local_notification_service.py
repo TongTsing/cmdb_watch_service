@@ -1,7 +1,9 @@
+import logging
+
 from cmdb_watch.domain.events.event import ChangedEvent
-from notification_service import NotificationService
+from cmdb_watch.domain.services.notification_service import NotificationService
 
 
 class LocalNotificationService(NotificationService):
     def notify(self, events: list[ChangedEvent]):
-        print(events)
+        logging.info(f"LocalNotificationService received events: {events}")

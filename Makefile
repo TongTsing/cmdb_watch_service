@@ -34,7 +34,7 @@ lint:
 # 运行测试
 # ==============================
 test:
-	poetry run pytest
+	poetry run pytest -s --log-cli-level=INFO
 
 
 # ==============================

@@ -1,5 +1,5 @@
 # src/cmdb_watch/domain/entities/watcher.py
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from collections import deque
 from typing import NewType, Tuple
 from uuid import uuid4
@@ -15,6 +15,7 @@ class WatcherRule:
     """
     Watcher 的规则部分：不可变
     """
+
     id: WatcherRuleId
     model: WatcherRuleModel
     fields: Tuple[str, ...]
@@ -27,6 +28,7 @@ class Cursor:
     """
     Cursor 管理 Watcher 的消费状态
     """
+
     def __init__(self, initial: str = 0, history_size: int = 10):
         self.value: str = initial
         self._history: deque[str] = deque(maxlen=history_size)
@@ -52,7 +54,13 @@ class Watcher:
     - cursor: 可变
     - id: 实体唯一标识
     """
-    def __init__(self, rule: WatcherRule, initial_cursor: str, watcher_id: WatcherId | None = None):
+
+    def __init__(
+        self,
+        rule: WatcherRule,
+        initial_cursor: str,
+        watcher_id: WatcherId | None = None,
+    ):
         self.id: WatcherId = watcher_id or WatcherId(str(uuid4()))
         self.rule: WatcherRule = rule
         self.cursor: Cursor = Cursor(initial_cursor)
