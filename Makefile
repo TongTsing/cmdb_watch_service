@@ -1,5 +1,6 @@
 # Makefile 用于统一开发命令
-# 可以避免每次输入很长的命令
+
+.PHONY: install run format lint lint-fix test test-cov clean precommit ci fix
 
 
 # ==============================
@@ -30,6 +31,11 @@ lint:
 	poetry run ruff check .
 
 
+# 自动修复 lint
+lint-fix:
+	poetry run ruff check . --fix
+
+
 # ==============================
 # 运行测试
 # ==============================
@@ -37,8 +43,40 @@ test:
 	poetry run pytest -s --log-cli-level=INFO
 
 
+# 覆盖率
+test-cov:
+	poetry run pytest --cov=src --cov-report=term-missing --cov-report=html
+
+
 # ==============================
-# 运行所有 pre-commit 检查
+# 清理缓存
+# ==============================
+clean:
+	find . -type d -name "__pycache__" -exec rm -rf {} +
+	find . -type d -name ".pytest_cache" -exec rm -rf {} +
+	find . -type d -name ".mypy_cache" -exec rm -rf {} +
+	find . -type d -name ".ruff_cache" -exec rm -rf {} +
+	find . -type d -name ".tox" -exec rm -rf {} +
+	find . -type f -name "*.pyc" -delete
+	rm -rf .coverage htmlcov build dist *.egg-info
+
+
+# ==============================
+# pre-commit
 # ==============================
 precommit:
 	pre-commit run --all-files
+
+
+# ==============================
+# 本地 CI
+# ==============================
+ci: clean lint test
+
+
+# ==============================
+# 常用修复流程
+# ==============================
+fix:
+	make format
+	make lint-fix

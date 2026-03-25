@@ -1,7 +1,7 @@
-from cmdb_watch.domain.services.notification_service import NotificationService
 from cmdb_watch.domain.services.watcher_service import WatcherService
 from cmdb_watch.infrastructure.watch_client import WatchClient
 from cmdb_watch.infrastructure.watcher_repository import WatcherRepository
+from cmdb_watch.shared.event_bus import EventBus
 
 
 class WatchService:
@@ -11,12 +11,12 @@ class WatchService:
         watcher_repo: WatcherRepository,
         watch_client: WatchClient,
         watcher_service: WatcherService,
-        notifier: NotificationService,
+        event_bus: EventBus,
     ):
         self.watcher_repo = watcher_repo
         self.client = watch_client
         self.watcher_service = watcher_service
-        self.notifier = notifier
+        self.event_bus = event_bus
 
     def run(self):
 
@@ -29,7 +29,7 @@ class WatchService:
             events = self.watcher_service.run(watcher, data)
 
             if events:
-                self.notifier.notify(events)
+                self.event_bus.publish(events)
 
             # 更新 cursor（你后面可以细化）
             watcher.update_cursor(data[-1]["bk_cursor"])

@@ -17,6 +17,6 @@ class EmailNotificationService(NotificationService):
             body=f"Watcher {watcher.id} detected an event of type {event.event_type} on instance {event.instance_id} of model {event.model}.",
         )
 
-    def notify(self, events: list[ChangedEvent]):
-        for event in events:
-            self.send_notification(self.watcher_repo.get_by_id(event.watcher_id), event)
+    def notify(self, event: ChangedEvent):
+        watcher = self.watcher_repo.get_watchers_for_event(event)
+        self.send_notification(watcher, event)

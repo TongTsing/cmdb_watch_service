@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-
 from cmdb_watch.domain.entities.watcher import Watcher
 from cmdb_watch.domain.events.event import ChangedEvent
 

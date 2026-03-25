@@ -23,3 +23,10 @@ class WatcherRepository(ABC):
         获取所有 Watcher
         """
         raise NotImplementedError
+
+    @abstractmethod
+    def get_watchers_for_event(self, event) -> Watcher:
+        """
+        根据事件获取相关的 Watcher
+        """
+        raise NotImplementedError

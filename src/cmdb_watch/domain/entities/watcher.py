@@ -29,7 +29,7 @@ class Cursor:
     Cursor 管理 Watcher 的消费状态
     """
 
-    def __init__(self, initial: str = 0, history_size: int = 10):
+    def __init__(self, initial: str, history_size: int = 10):
         self.value: str = initial
         self._history: deque[str] = deque(maxlen=history_size)
 

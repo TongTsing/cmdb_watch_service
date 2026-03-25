@@ -4,5 +4,5 @@ from cmdb_watch.domain.events.event import ChangedEvent
 
 class NotificationService(ABC):
     @abstractmethod
-    def notify(self, events: list[ChangedEvent]):
+    def notify(self, event: ChangedEvent):
         raise NotImplementedError
