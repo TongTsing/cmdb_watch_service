@@ -8,9 +8,11 @@ class EventHandler(Protocol):
 
 class EventBus:
     def __init__(self):
-        self._handlers: list[EventHandler] = []
+        self._handlers: dict[type[ChangedEvent], list[EventHandler]] = {}
 
-    def register_handler(self, handler: EventHandler) -> None:
+    def register_handler(
+        self, event_type: type[ChangedEvent], handler: EventHandler
+    ) -> None:
         """
         Register an event handler to receive events.
         """
@@ -27,10 +29,17 @@ class SimpleEventBus(EventBus):
     def __init__(self):
         super().__init__()
 
-    def register_handler(self, handler: EventHandler) -> None:
-        self._handlers.append(handler)
+    def register_handler(
+        self, event_type: type[ChangedEvent], handler: EventHandler
+    ) -> None:
+        if event_type not in self._handlers:
+            self._handlers[event_type] = []
+
+        self._handlers[event_type].append(handler)
 
     def publish(self, events: list[ChangedEvent]) -> None:
-        for handler in self._handlers:
-            for event in events:
-                handler.handle(event)
+        for event in events:
+            for event_type, handlers in self._handlers.items():
+                if isinstance(event, event_type):
+                    for handler in handlers:
+                        handler.handle(event)

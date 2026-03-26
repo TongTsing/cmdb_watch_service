@@ -7,6 +7,7 @@ from cmdb_watch.domain.entities.watcher import (
     WatcherRuleModel,
 )
 
+
 InstanceID = NewType("InstanceID", str)
 
 
