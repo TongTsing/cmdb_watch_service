@@ -9,11 +9,8 @@ from cmdb_watch.domain.entities.watcher import (
     WatcherRuleModel,
 )
 from cmdb_watch.application.watch_service import WatchService
-from cmdb_watch.domain.services.email_notification_service import (
-    EmailNotificationService,
-)
-from cmdb_watch.infrastructure.email.email_client import SMTPEmailClient
-from cmdb_watch.infrastructure.notification.email_handler import EmailHandler
+from cmdb_watch.domain.events.event import CreatedEvent, UpdatedEvent
+from cmdb_watch.application.handlers.email_handler import EmailHandler
 from cmdb_watch.infrastructure.watch_client_impl import WatchClientImpl
 from cmdb_watch.infrastructure.watcher_repository_impl import InMemoryWatcherRepository
 from cmdb_watch.domain.services.watcher_service_impl import WatcherServiceImpl
@@ -42,7 +39,7 @@ def test_1():
         )
         watcher_repo = InMemoryWatcherRepository()
         watcher = Watcher(
-            WatcherRule(
+            rule=WatcherRule(
                 id=WatcherRuleId("1"),
                 model=WatcherRuleModel("test_tq"),
                 fields=("id",),
@@ -50,23 +47,15 @@ def test_1():
                 notify_emails=("togqing@canway.net",),
                 enabled=True,
             ),
-            "MQ04DTY5YjI1OWIzYmZjNDc0ODdiN2QyODA4NQ11cGRhdGUNMTc3MzY0ODgzNQ02DTU4MDA=",
-            WatcherId("1"),
+            initial_cursor="MQ04DTY5YjI1OWIzYmZjNDc0ODdiN2QyODA4NQ11cGRhdGUNMTc3MzY0ODgzNQ02DTU4MDA=",
+            watcher_id=WatcherId("1"),
         )
-        email_client = SMTPEmailClient(
-            smtp_server="smtp.163.com",
-            port=25,
-            username="dearhaly@163.com",
-            password="AQh9wPnhb5bE8VUi",
-            use_tls=False,  # 根据你的 SMTP 服务器配置调整
-            from_email="dearhaly@163.com",
-        )
-        email_service = EmailNotificationService(watcher_repo, email_client)
         watcher_repo.save(watcher)
         watcher_service = WatcherServiceImpl()
         event_bus = SimpleEventBus()
-        email_handler = EmailHandler(watcher_repo, email_service)
-        event_bus.register_handler(email_handler)
+        event_handler = EmailHandler()
+        event_bus.register(CreatedEvent, event_handler)
+        event_bus.register(UpdatedEvent, event_handler)
 
         watch_service = WatchService(
             watcher_service=watcher_service,

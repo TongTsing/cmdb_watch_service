@@ -1,45 +1,46 @@
-from typing import Protocol
-from cmdb_watch.domain.events.event import ChangedEvent
+from abc import ABC, abstractmethod
+
+from cmdb_watch.domain.events.event import BaseEvent
+from cmdb_watch.application.handlers.base import EventHandler
 
 
-class EventHandler(Protocol):
-    def handle(self, event: ChangedEvent) -> None: ...
-
-
-class EventBus:
-    def __init__(self):
-        self._handlers: dict[type[ChangedEvent], list[EventHandler]] = {}
-
-    def register_handler(
-        self, event_type: type[ChangedEvent], handler: EventHandler
-    ) -> None:
+class EventBus(ABC):
+    @abstractmethod
+    def register(self, event_type: type[BaseEvent], handler: EventHandler) -> None:
         """
-        Register an event handler to receive events.
+        Register an event handler for a specific event type.
         """
-        ...
+        pass
 
-    def publish(self, events: list[ChangedEvent]) -> None:
+    @abstractmethod
+    def publish(self, events: list[BaseEvent]) -> None:
         """
-        Publish an event to all registered handlers.
+        Publish events to all matched handlers.
         """
-        ...
+        pass
 
 
 class SimpleEventBus(EventBus):
     def __init__(self):
-        super().__init__()
+        # key: event_type, value: list of handlers
+        self._handlers: dict[type[BaseEvent], list[EventHandler]] = {}
 
-    def register_handler(
-        self, event_type: type[ChangedEvent], handler: EventHandler
-    ) -> None:
+    def register(self, event_type: type[BaseEvent], handler: EventHandler) -> None:
         if event_type not in self._handlers:
             self._handlers[event_type] = []
 
-        self._handlers[event_type].append(handler)
+        # 防止重复注册
+        if handler not in self._handlers[event_type]:
+            self._handlers[event_type].append(handler)
 
-    def publish(self, events: list[ChangedEvent]) -> None:
+    def publish(self, events: list[BaseEvent]) -> None:
         for event in events:
             for event_type, handlers in self._handlers.items():
                 if isinstance(event, event_type):
                     for handler in handlers:
-                        handler.handle(event)
+                        try:
+                            handler.handle(event)
+                        except Exception as e:
+                            print(
+                                f"[EventBus] handler error: {handler}, event: {event}, error: {e}"
+                            )

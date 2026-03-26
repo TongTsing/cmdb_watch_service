@@ -1,8 +1,9 @@
 from abc import ABC, abstractmethod
+
 from cmdb_watch.domain.events.base import BaseEvent
 
 
-class NotificationService(ABC):
+class EventHandler(ABC):
     @abstractmethod
-    def notify(self, event: BaseEvent) -> None:
+    def handle(self, event: BaseEvent) -> None:
         raise NotImplementedError
