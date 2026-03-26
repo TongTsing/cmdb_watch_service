@@ -46,5 +46,5 @@ class WatcherServiceImpl(WatcherService):
                     watcher_id=WatcherId(watcher.id),
                 )
             case _:
-                return []
+                raise ValueError(f"Unknown event type: {event_type}")
         return [event]
