@@ -8,7 +8,7 @@ def test_email_client():
         smtp_server="smtp.163.com",
         port=25,
         username="dearhaly@163.com",
-        password="AQh9wPnhb5bE8VUi",
+        password="dsafdafda",
         use_tls=False,  # 根据你的 SMTP 服务器配置调整
         from_email="dearhaly@163.com",
     )
